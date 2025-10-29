@@ -39,3 +39,5 @@ Route::post('/cart/remove/{ticket_id}', [CartController::class, 'remove'])->name
 
 Route::get('/cart/buy/{ticket_id}', [CartController::class, 'buy'])->name('cart.buy');
 Route::post('/cart/purchase', [CartController::class, 'purchase'])->name('cart.purchase');
+
+Route::get('/test-session', function () {return response()->json(Session::all());});
