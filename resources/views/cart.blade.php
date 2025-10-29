@@ -43,7 +43,7 @@
             </button>
         </div>
 
-        {{-- Form pembelian (disembunyikan dulu) --}}
+        {{-- FORM PEMBELIAN --}}
         <div id="purchaseForm" class="bg-pink-100 p-5 rounded-lg w-2/3 mx-auto mt-5 hidden">
             <h3 class="text-lg font-semibold text-center mb-3">Form Pembelian</h3>
 
@@ -53,7 +53,7 @@
                     <div class="border-b border-gray-300 mb-3 pb-3">
                         <p><strong>Nama Event:</strong> {{ $item['event_name'] ?? '-' }}</p>
                         <p><strong>Nama Tiket:</strong> {{ $item['name'] }}</p>
-                        <p><strong>Harga per Tiket:</strong> Rp {{ number_format($item['price']) }}</p>
+                        <p><strong>Harga per Tiket:</strong> Rp <span class="price">{{ number_format($item['price']) }}</span></p>
 
                         <div class="flex items-center gap-2 mt-2">
                             <button type="button" class="bg-pink-400 text-white px-2 rounded decrease">-</button>
@@ -68,21 +68,31 @@
                     </div>
                 @endforeach
 
+                {{-- Total keseluruhan --}}
+                <div class="text-right font-bold text-lg mt-4">
+                    Total Keseluruhan: <span id="grandTotal">Rp 0</span>
+                </div>
+
                 <div class="text-center mt-5">
-                    <button id="buyNowBtn" type="submit" class="bg-pink-600 hover:bg-pink-700 text-white px-5 py-2 rounded-md">
+                    <button id="buyNowBtn" type="submit"
+                        class="bg-pink-600 hover:bg-pink-700 text-white px-5 py-2 rounded-md">
                         Beli Sekarang
                     </button>
                 </div>
             </form>
         </div>
 
+        {{-- SCRIPT --}}
         <script>
-            // tampil/sembunyikan form
-            document.getElementById('showFormBtn').addEventListener('click', () => {
-                document.getElementById('purchaseForm').classList.toggle('hidden');
+            const showFormBtn = document.getElementById('showFormBtn');
+            const purchaseForm = document.getElementById('purchaseForm');
+            const grandTotalEl = document.getElementById('grandTotal');
+
+            showFormBtn.addEventListener('click', () => {
+                purchaseForm.classList.toggle('hidden');
+                hitungTotalKeseluruhan();
             });
 
-            // tambah dan kurang jumlah
             document.querySelectorAll('.increase').forEach(btn => {
                 btn.addEventListener('click', function() {
                     const input = this.previousElementSibling;
@@ -101,30 +111,41 @@
 
             function updateTotal(btn) {
                 const wrapper = btn.closest('div.border-b');
-                const price = parseInt(wrapper.querySelector('p:nth-child(3)').innerText.replace(/\D/g, ''));
+                const price = parseInt(wrapper.querySelector('.price').innerText.replace(/\D/g, ''));
                 const qty = parseInt(wrapper.querySelector('input[type=number]').value);
-                wrapper.querySelector('.total').innerText = "Rp " + (price * qty).toLocaleString();
+                const totalEl = wrapper.querySelector('.total');
+                totalEl.innerText = "Rp " + (price * qty).toLocaleString();
+                hitungTotalKeseluruhan();
+            }
+
+            function hitungTotalKeseluruhan() {
+                let total = 0;
+                document.querySelectorAll('.total').forEach(el => {
+                    total += parseInt(el.innerText.replace(/\D/g, '')) || 0;
+                });
+                grandTotalEl.innerText = "Rp " + total.toLocaleString();
             }
 
             // efek pembelian berhasil
             const form = document.getElementById('purchaseFormReal');
             form.addEventListener('submit', function(e) {
-                e.preventDefault(); // stop dulu submit benerannya
+                e.preventDefault();
                 const btn = document.getElementById('buyNowBtn');
                 btn.innerText = 'Selesai';
                 btn.disabled = true;
 
-                // notif pesanan berhasil
                 const notif = document.createElement('div');
                 notif.className = 'bg-green-200 text-green-800 p-2 rounded mb-3 text-center';
                 notif.innerText = 'Pesanan berhasil!';
                 form.parentNode.insertBefore(notif, form);
 
-                // redirect ke dashboard setelah 1.5 detik
                 setTimeout(() => {
                     form.submit();
                 }, 1500);
             });
+
+            // Jalankan awal
+            hitungTotalKeseluruhan();
         </script>
 
     @else
