@@ -5,6 +5,7 @@ use App\Http\Controllers\EventController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\CartController;
 
 // LOGIN
 Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
@@ -30,3 +31,11 @@ Route::get('/tickets/{id}/destroy', [TicketController::class, 'destroy'])->name(
 
 // DASHBOARD
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+// CART
+Route::get('/cart', [CartController::class, 'show'])->name('cart.show');
+Route::post('/cart/add/{ticket_id}', [CartController::class, 'add'])->name('cart.add');
+Route::post('/cart/remove/{ticket_id}', [CartController::class, 'remove'])->name('cart.remove');
+
+Route::get('/cart/buy/{ticket_id}', [CartController::class, 'buy'])->name('cart.buy');
+Route::post('/cart/purchase', [CartController::class, 'purchase'])->name('cart.purchase');
